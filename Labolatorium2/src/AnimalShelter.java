@@ -27,6 +27,7 @@ public class AnimalShelter {
     }
 
     // Dodawanie zwierzęcia
+
     public void addAnimal(Animal animal) {
 
         if (animalList.size() >= maxCapacity) {
@@ -59,6 +60,7 @@ public class AnimalShelter {
 
 
     // Usuwanie zwierzęcia
+
     public void removeAnimal(Animal animal) {
 
         animalList.remove(animal);

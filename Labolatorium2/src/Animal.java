@@ -10,9 +10,6 @@ public class Animal implements Comparable<Animal> {
 
     private double Cena;
 
-
-    // Dodatkowe pole dla identyfikacji unikalnych zwierząt (opcjonalnie)
-
     private static int idCounter = 1;
 
     private final int id;
@@ -33,6 +30,7 @@ public class Animal implements Comparable<Animal> {
         this.Cena = price;
 
         this.id = idCounter++;
+
     }
 
 
@@ -53,6 +51,7 @@ public class Animal implements Comparable<Animal> {
                 ", Cena: " + Cena);
 
     }
+
 
     // Implementacja interfejsu Comparable<Animal> – porównanie według imienia, gatunku lub wieku
 
@@ -89,9 +88,21 @@ public class Animal implements Comparable<Animal> {
 
     }
 
+    public void setName(String name) {
+
+        this.Imie = name;
+
+    }
+
     public String getSpecies() {
 
         return Gatunek;
+
+    }
+
+    public void setSpecies(String species) {
+
+        this.Gatunek = species;
 
     }
 
@@ -125,9 +136,10 @@ public class Animal implements Comparable<Animal> {
 
     }
 
-    public int getId() {
+    public void setPrice(double price) {
 
-        return id;
+        this.Cena = price;
 
     }
+
 }

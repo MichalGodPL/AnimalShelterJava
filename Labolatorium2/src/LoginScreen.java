@@ -169,7 +169,7 @@ public class LoginScreen {
 
             frame.dispose();
 
-            new AdminPanel().show();
+            new UserPanel().show();
 
         });
 

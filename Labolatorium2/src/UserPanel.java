@@ -26,7 +26,6 @@ public class UserPanel {
 
     }
 
-
     public void show() {
 
         JFrame frame = new JFrame();
@@ -82,7 +81,7 @@ public class UserPanel {
         headerPanel.setBackground(Color.WHITE);
 
 
-        JLabel headerLabel = new JLabel("USER PANEL", SwingConstants.CENTER);
+        JLabel headerLabel = new JLabel("ADMIN PANEL", SwingConstants.CENTER);
 
         headerLabel.setFont(new Font("Segoe UI", Font.BOLD, 36));
 
@@ -93,7 +92,6 @@ public class UserPanel {
         headerPanel.add(headerLabel);
 
         mainPanel.add(headerPanel, BorderLayout.NORTH);
-
 
         // Tabela schronisk
 
@@ -117,23 +115,142 @@ public class UserPanel {
         mainPanel.add(shelterScrollPane, BorderLayout.CENTER);
 
 
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+
+        filterPanel.setBackground(Color.WHITE);
+
+        // Pole tekstowe do filtrowania
+
+        JTextField filterField = new JTextField(15);
+
+        filterField.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+
+        filterField.setToolTipText("Wpisz nazwę schroniska i naciśnij Enter, aby przefiltrować.");
+
+        filterPanel.add(new JLabel("Filtruj nazwę:"));
+
+        filterPanel.add(filterField);
+
+
+        // Lista rozwijana do filtrowania stanu
+
+        JComboBox<String> stateComboBox = new JComboBox<>(new String[]{"Wszystkie", "Puste", "Pełne"});
+
+        stateComboBox.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+
+        stateComboBox.setToolTipText("Wybierz stan schroniska.");
+
+        filterPanel.add(new JLabel("Stan:"));
+
+        filterPanel.add(stateComboBox);
+
+        mainPanel.add(filterPanel, BorderLayout.NORTH);
+
+        // Obsługa pola tekstowego
+
+        filterField.addActionListener(e -> {
+
+            String query = filterField.getText();
+
+            shelterTableModel.filterByName(query); // Filtrowanie tabeli
+
+        });
+
+
+        // Obsługa listy rozwijanej
+
+        stateComboBox.addActionListener(e -> {
+
+            String selectedState = (String) stateComboBox.getSelectedItem();
+
+            shelterTableModel.filterByState(selectedState); // Filtrowanie tabeli
+
+        });
+
+
         // Panel przycisków
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
 
         buttonPanel.setBackground(Color.WHITE);
 
+
+        RoundedButton addShelterButton = new RoundedButton("Dodaj schronisko");
+
+        RoundedButton removeShelterButton = new RoundedButton("Usuń schronisko");
+
         RoundedButton viewAnimalsButton = new RoundedButton("Pokaż zwierzęta");
 
-        RoundedButton adoptAnimalButton = new RoundedButton("Adoptuj zwierzę");
+        RoundedButton modifyShelterButton = new RoundedButton("Edytuj schronisko");
 
         RoundedButton closeButton = new RoundedButton("X");
 
-        styleButton(viewAnimalsButton, new Color(45, 85, 255), Color.WHITE);
 
-        styleButton(adoptAnimalButton, new Color(100, 200, 150), Color.WHITE);
+        styleButton(addShelterButton, new Color(45, 85, 255), Color.WHITE);
+
+        styleButton(removeShelterButton, new Color(100, 200, 150), Color.WHITE);
+
+        styleButton(viewAnimalsButton, new Color(255, 165, 0), Color.WHITE);
 
         styleButton(closeButton, new Color(255, 0, 0, 180), Color.WHITE);
+
+        styleButton(modifyShelterButton, new Color(188, 125, 200), Color.WHITE);
+
+        closeButton.addActionListener(e -> System.exit(0));
+
+
+        buttonPanel.add(addShelterButton);
+
+        buttonPanel.add(removeShelterButton);
+
+        buttonPanel.add(viewAnimalsButton);
+
+        buttonPanel.add(modifyShelterButton);
+
+        buttonPanel.add(closeButton);
+
+
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+
+        // Obsługa przycisków
+
+        addShelterButton.addActionListener(e -> {
+
+            String name = JOptionPane.showInputDialog(frame, "Podaj nazwę schroniska:");
+
+            String capacity = JOptionPane.showInputDialog(frame, "Podaj pojemność schroniska:");
+
+            if (name != null && capacity != null) {
+
+                manager.addShelter(name, Integer.parseInt(capacity));
+
+                shelterTable.setModel(new ShelterTableModel(new ArrayList<>(manager.getShelters().values())));
+
+            }
+
+        });
+
+
+        removeShelterButton.addActionListener(e -> {
+
+            int selectedRow = shelterTable.getSelectedRow();
+
+            if (selectedRow >= 0) {
+
+                String name = (String) shelterTable.getValueAt(selectedRow, 0);
+
+                manager.removeShelter(name);
+
+                shelterTable.setModel(new ShelterTableModel(new ArrayList<>(manager.getShelters().values())));
+
+            } else {
+
+                JOptionPane.showMessageDialog(frame, "Wybierz schronisko do usunięcia!");
+
+            }
+
+        });
 
 
         viewAnimalsButton.addActionListener(e -> {
@@ -156,15 +273,54 @@ public class UserPanel {
 
         });
 
-        closeButton.addActionListener(e -> System.exit(0));
+        modifyShelterButton.addActionListener(e -> {
 
-        buttonPanel.add(viewAnimalsButton);
+            int selectedRow = shelterTable.getSelectedRow();
 
-        buttonPanel.add(adoptAnimalButton);
+            if (selectedRow >= 0) {
 
-        buttonPanel.add(closeButton); // Dodanie przycisku zamknięcia do dolnego panelu
+                String name = (String) shelterTable.getValueAt(selectedRow, 0);
 
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+                AnimalShelter selectedShelter = manager.getShelter(name);
+
+
+                // Pobranie nowych danych od użytkownika
+
+                String newName = JOptionPane.showInputDialog(frame, "Podaj nową nazwę:", selectedShelter.getShelterName());
+
+                String newCapacity = JOptionPane.showInputDialog(frame, "Podaj nową pojemność:", selectedShelter.getMaxCapacity());
+
+                if (newName != null && newCapacity != null) {
+
+                    try {
+
+                        int capacity = Integer.parseInt(newCapacity);
+
+                        // Aktualizacja danych schroniska
+
+                        manager.removeShelter(name); // Usuwamy stare
+
+                        manager.addShelter(newName, capacity); // Dodajemy zaktualizowane
+
+                        // Odświeżenie tabeli
+
+                        shelterTable.setModel(new ShelterTableModel(new ArrayList<>(manager.getShelters().values())));
+
+                    } catch (NumberFormatException ex) {
+
+                        JOptionPane.showMessageDialog(frame, "Pojemność musi być liczbą całkowitą!", "Błąd", JOptionPane.ERROR_MESSAGE);
+
+                    }
+
+                }
+
+            } else {
+
+                JOptionPane.showMessageDialog(frame, "Wybierz schronisko do edycji!");
+
+            }
+
+        });
 
         frame.setVisible(true);
 
@@ -194,6 +350,7 @@ public class UserPanel {
 
             }
 
+
             @Override
 
             public void mouseExited(MouseEvent e) {
@@ -212,7 +369,9 @@ public class UserPanel {
             }
 
         });
+
     }
+
 
     // Niestandardowa klasa przycisku z zaokrąglonymi rogami
 

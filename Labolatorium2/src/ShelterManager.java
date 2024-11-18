@@ -42,6 +42,7 @@ public class ShelterManager {
     public List<AnimalShelter> findEmpty() {
 
         return shelters.values().stream()
+
                 .filter(shelter -> shelter.getCurrentCapacity() == 0)
 
                 .collect(Collectors.toList());
