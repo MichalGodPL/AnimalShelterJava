@@ -112,7 +112,7 @@ public class AnimalPanel {
             String priceString = JOptionPane.showInputDialog(frame, "Podaj cenę adopcji:");
 
 
-            String[] conditions = {"ZDROWE", "CHORE"};
+            String[] conditions = {"ZDROWE", "CHORE", "W TRAKCIE ADOPCJI", "KWARANTANNA"};
 
             String condition = (String) JOptionPane.showInputDialog(
 

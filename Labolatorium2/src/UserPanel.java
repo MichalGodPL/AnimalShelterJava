@@ -26,6 +26,7 @@ public class UserPanel {
 
     }
 
+
     public void show() {
 
         JFrame frame = new JFrame();
@@ -91,6 +92,7 @@ public class UserPanel {
 
         headerPanel.add(headerLabel);
 
+
         mainPanel.add(headerPanel, BorderLayout.NORTH);
 
         // Tabela schronisk
@@ -107,7 +109,6 @@ public class UserPanel {
 
         shelterTable.getTableHeader().setBackground(new Color(230, 230, 230));
 
-
         ShelterTableModel.enableSorting(shelterTable, shelterTableModel);
 
         JScrollPane shelterScrollPane = new JScrollPane(shelterTable);
@@ -115,11 +116,12 @@ public class UserPanel {
         mainPanel.add(shelterScrollPane, BorderLayout.CENTER);
 
 
+        // Panel filtrowania
+
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
 
         filterPanel.setBackground(Color.WHITE);
 
-        // Pole tekstowe do filtrowania
 
         JTextField filterField = new JTextField(15);
 
@@ -132,8 +134,6 @@ public class UserPanel {
         filterPanel.add(filterField);
 
 
-        // Lista rozwijana do filtrowania stanu
-
         JComboBox<String> stateComboBox = new JComboBox<>(new String[]{"Wszystkie", "Puste", "Pełne"});
 
         stateComboBox.setFont(new Font("Segoe UI", Font.PLAIN, 16));
@@ -145,6 +145,7 @@ public class UserPanel {
         filterPanel.add(stateComboBox);
 
         mainPanel.add(filterPanel, BorderLayout.NORTH);
+
 
         // Obsługa pola tekstowego
 
@@ -175,83 +176,26 @@ public class UserPanel {
         buttonPanel.setBackground(Color.WHITE);
 
 
-        RoundedButton addShelterButton = new RoundedButton("Dodaj schronisko");
-
-        RoundedButton removeShelterButton = new RoundedButton("Usuń schronisko");
-
         RoundedButton viewAnimalsButton = new RoundedButton("Pokaż zwierzęta");
-
-        RoundedButton modifyShelterButton = new RoundedButton("Edytuj schronisko");
 
         RoundedButton closeButton = new RoundedButton("X");
 
-
-        styleButton(addShelterButton, new Color(45, 85, 255), Color.WHITE);
-
-        styleButton(removeShelterButton, new Color(100, 200, 150), Color.WHITE);
 
         styleButton(viewAnimalsButton, new Color(255, 165, 0), Color.WHITE);
 
         styleButton(closeButton, new Color(255, 0, 0, 180), Color.WHITE);
 
-        styleButton(modifyShelterButton, new Color(188, 125, 200), Color.WHITE);
 
         closeButton.addActionListener(e -> System.exit(0));
 
-
-        buttonPanel.add(addShelterButton);
-
-        buttonPanel.add(removeShelterButton);
-
         buttonPanel.add(viewAnimalsButton);
-
-        buttonPanel.add(modifyShelterButton);
 
         buttonPanel.add(closeButton);
 
 
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-
-        // Obsługa przycisków
-
-        addShelterButton.addActionListener(e -> {
-
-            String name = JOptionPane.showInputDialog(frame, "Podaj nazwę schroniska:");
-
-            String capacity = JOptionPane.showInputDialog(frame, "Podaj pojemność schroniska:");
-
-            if (name != null && capacity != null) {
-
-                manager.addShelter(name, Integer.parseInt(capacity));
-
-                shelterTable.setModel(new ShelterTableModel(new ArrayList<>(manager.getShelters().values())));
-
-            }
-
-        });
-
-
-        removeShelterButton.addActionListener(e -> {
-
-            int selectedRow = shelterTable.getSelectedRow();
-
-            if (selectedRow >= 0) {
-
-                String name = (String) shelterTable.getValueAt(selectedRow, 0);
-
-                manager.removeShelter(name);
-
-                shelterTable.setModel(new ShelterTableModel(new ArrayList<>(manager.getShelters().values())));
-
-            } else {
-
-                JOptionPane.showMessageDialog(frame, "Wybierz schronisko do usunięcia!");
-
-            }
-
-        });
-
+        // Obsługa przycisku "Pokaż zwierzęta"
 
         viewAnimalsButton.addActionListener(e -> {
 
@@ -263,6 +207,28 @@ public class UserPanel {
 
                 AnimalShelter shelter = manager.getShelter(shelterName);
 
+
+                // Dodanie przykładowych zwierząt do schroniska A i B
+
+                if (shelter.getShelterName().equals("Schronisko A") && shelter.getAnimals().isEmpty()) {
+
+                    shelter.addAnimal(new Animal("Michaś", "Tajpan Pustynny", AnimalCondition.CHORE, 2, 2137.0));
+
+                    shelter.addAnimal(new Animal("Reksio", "Pies", AnimalCondition.ZDROWE, 13, 1200.0));
+
+                    shelter.addAnimal(new Animal("Raku Chan", "Kot", AnimalCondition.ZDROWE, 9, 500.0));
+
+
+                } else if (shelter.getShelterName().equals("Schronisko B") && shelter.getAnimals().isEmpty()) {
+
+                    shelter.addAnimal(new Animal("Dogullson", "Pies", AnimalCondition.ZDROWE, 4, 800.0));
+
+                    shelter.addAnimal(new Animal("Pipson", "Gryzoń", AnimalCondition.CHORE, 1, 200.0));
+
+                }
+
+                // Otwieranie panelu AnimalPanel dla wybranego schroniska
+
                 new AnimalPanel(shelter).show();
 
             } else {
@@ -273,61 +239,10 @@ public class UserPanel {
 
         });
 
-        modifyShelterButton.addActionListener(e -> {
-
-            int selectedRow = shelterTable.getSelectedRow();
-
-            if (selectedRow >= 0) {
-
-                String name = (String) shelterTable.getValueAt(selectedRow, 0);
-
-                AnimalShelter selectedShelter = manager.getShelter(name);
-
-
-                // Pobranie nowych danych od użytkownika
-
-                String newName = JOptionPane.showInputDialog(frame, "Podaj nową nazwę:", selectedShelter.getShelterName());
-
-                String newCapacity = JOptionPane.showInputDialog(frame, "Podaj nową pojemność:", selectedShelter.getMaxCapacity());
-
-                if (newName != null && newCapacity != null) {
-
-                    try {
-
-                        int capacity = Integer.parseInt(newCapacity);
-
-                        // Aktualizacja danych schroniska
-
-                        manager.removeShelter(name); // Usuwamy stare
-
-                        manager.addShelter(newName, capacity); // Dodajemy zaktualizowane
-
-                        // Odświeżenie tabeli
-
-                        shelterTable.setModel(new ShelterTableModel(new ArrayList<>(manager.getShelters().values())));
-
-                    } catch (NumberFormatException ex) {
-
-                        JOptionPane.showMessageDialog(frame, "Pojemność musi być liczbą całkowitą!", "Błąd", JOptionPane.ERROR_MESSAGE);
-
-                    }
-
-                }
-
-            } else {
-
-                JOptionPane.showMessageDialog(frame, "Wybierz schronisko do edycji!");
-
-            }
-
-        });
-
         frame.setVisible(true);
 
     }
 
-
-    // Stylizacja przycisków
 
     private void styleButton(RoundedButton button, Color bgColor, Color fgColor) {
 
@@ -372,8 +287,6 @@ public class UserPanel {
 
     }
 
-
-    // Niestandardowa klasa przycisku z zaokrąglonymi rogami
 
     static class RoundedButton extends JButton {
 

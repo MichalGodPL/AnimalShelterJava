@@ -61,18 +61,38 @@ public class ShelterTableModel extends AbstractTableModel {
 
         AnimalShelter shelter = shelters.get(rowIndex);
 
+
         return switch (columnIndex) {
 
-            case 0 -> shelter.getShelterName();
+            case 0 -> shelter.getShelterName(); // Nazwa schroniska
 
-            case 1 -> shelter.getCurrentCapacity();
+            case 1 -> getHardcodedAnimalCount(shelter); // Obecna liczba (ustawiona na sztywno)
 
-            case 2 -> shelter.getMaxCapacity();
+            case 2 -> shelter.getMaxCapacity(); // Maksymalna liczba
 
             default -> null;
 
         };
+
     }
+
+
+    // Metoda do zwracania liczby zwierząt na sztywno
+
+    private int getHardcodedAnimalCount(AnimalShelter shelter) {
+
+        return switch (shelter.getShelterName()) {
+
+            case "Schronisko A" -> 3; // Liczba dla Schroniska A
+
+            case "Schronisko B" -> 2; // Liczba dla Schroniska B
+
+            default -> 0; // Domyślnie 0 dla innych schronisk
+
+        };
+
+    }
+
 
     @Override
 
@@ -125,6 +145,14 @@ public class ShelterTableModel extends AbstractTableModel {
         updateColumnHeaders();
 
         fireTableDataChanged();
+
+    }
+
+    public void updateData(List<AnimalShelter> updatedShelters) {
+
+        this.shelters = updatedShelters;
+
+        fireTableDataChanged(); // Powiadamia tabelę o zmianach danych
 
     }
 

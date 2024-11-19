@@ -6,6 +6,7 @@ import java.awt.event.*;
 
 import java.util.ArrayList;
 
+import javax.swing.border.EmptyBorder;
 
 public class AdminPanel {
 
@@ -119,6 +120,7 @@ public class AdminPanel {
 
         filterPanel.setBackground(Color.WHITE);
 
+
         // Pole tekstowe do filtrowania
 
         JTextField filterField = new JTextField(15);
@@ -145,6 +147,7 @@ public class AdminPanel {
         filterPanel.add(stateComboBox);
 
         mainPanel.add(filterPanel, BorderLayout.NORTH);
+
 
         // Obsługa pola tekstowego
 
@@ -263,6 +266,28 @@ public class AdminPanel {
 
                 AnimalShelter shelter = manager.getShelter(shelterName);
 
+
+                // Dodanie przykładowych zwierząt do schroniska A i B
+
+                if (shelter.getShelterName().equals("Schronisko A") && shelter.getAnimals().isEmpty()) {
+
+                    shelter.addAnimal(new Animal("Michaś", "Tajpan Pustynny", AnimalCondition.CHORE, 2, 2137.0));
+
+                    shelter.addAnimal(new Animal("Reksio", "Pies", AnimalCondition.ZDROWE, 13, 1200.0));
+
+                    shelter.addAnimal(new Animal("Raku Chan", "Kot", AnimalCondition.ZDROWE, 10, 500.0));
+
+
+                } else if (shelter.getShelterName().equals("Schronisko B") && shelter.getAnimals().isEmpty()) {
+
+                    shelter.addAnimal(new Animal("Dogullson", "Pies", AnimalCondition.ZDROWE, 4, 800.0));
+
+                    shelter.addAnimal(new Animal("Pipson", "Gryzoń", AnimalCondition.CHORE, 1, 200.0));
+
+                }
+
+                // Otwieranie panelu AnimalPanel dla wybranego schroniska
+
                 new AnimalPanel(shelter).show();
 
             } else {
@@ -272,6 +297,7 @@ public class AdminPanel {
             }
 
         });
+
 
         modifyShelterButton.addActionListener(e -> {
 

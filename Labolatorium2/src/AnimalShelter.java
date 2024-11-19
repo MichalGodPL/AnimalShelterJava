@@ -67,6 +67,8 @@ public class AnimalShelter {
 
     }
 
+
+
     // Adopcja zwierzęcia
 
     public void getAnimal(Animal animal) {
@@ -212,5 +214,5 @@ public class AnimalShelter {
         return shelterName;
 
     }
-
+    
 }
